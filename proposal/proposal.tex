@@ -14,8 +14,26 @@
 
 %%% The Meat %%%
 
-\section*{First Section}
-Body of section goes here
+\section*{Background}
+Talk about importance of writing concurrent programs given trends in today's architectures. Highlight how writing concurrent programs is still difficult, prone to error. Rust is a new systems programming language that attempts to make writing concurrent programs easier for programmers through its type system. 
+
+Rust is a new systems programming language which guarantees memory safety through a complex type system. 
+
+Discuss Rust's concurrency constructs. Rust uses certain types to perform "extra runtime bookkeeping" on shared values, which we believe could negatively impact performance \cite{rust-lang.org}. Discuss pthreads in C.
+
+\section*{Goal and Description}
+Rust's new concurrency constructs make writing concurrent code safer and easier by preventing concurrency errors at compile time. We are interested in comparing the performance of threading in Rust and in C to see if Rust's new constructs affect its peformance in anyway. In other words, Rust helps programmers write concurrent code, but at what cost to performance?
+
+What metrics are we interested in?
+
+\section*{Methodology}
+We anticipate that C and Rust will perform differently on our benchmarks because there are many differences between them unrelated to concurrency. We will isolate the differences in performance due to each language's implementation of concurrency in the following way. We will choose a set of benchmarks that can be both run serially and parallelized. We will implement a serial and multithreaded version of each benchmark in both C and Rust. We will use the single-threaded benchmarks to
+establish a baseline comparison between the two languages.
+
+\section*{Equipment and Tools}
+We will be writing code 
+
+\section*{Timeline}
 
 %%% References %%%
 \bibliographystyle{unsrt}
