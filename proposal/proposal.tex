@@ -17,11 +17,11 @@
 
 \section*{Background}
 
-Computer architects today are faced with a power wall. CPU clock speeds cannot increase any further, else they will be unable to be cooled. Yet the number of transistors onchip continues to double every two years as dictated by Moore's Law, so the question to architects is this: what can we spend additional transistors on, if not clock speed? The industry has answered this question by converging on multicore computers: computers that integrate multiple processor cores into
+Computer architects today are faced with a power wall. CPU clock speeds cannot increase any further, or else they will be unable to be cooled. Yet the number of transistors onchip continues to double every two years as predicted by Moore's Law, so the question to architects is this: what can we spend additional transistors on, if not clock speed? The industry has answered this question by converging on multicore computers: computers that integrate multiple processor cores into
 one chip \cite{Larus:2009}. The industry is forced to favor increased parallelism over increased speed.
 
 This shift has huge ramifications for programmers. A program's performance improves automatically as clock speed increases, but programs need to be written specially to take advantage of hardware parallelism. As of now, multicore machines put the burden of utilizing parallel cores on the programmer, and writing parallel programs is difficult. It is hard for most people to decompose a program into parallel workloads and think about all of the interactions that can occur as they
-are executing at once. This makes the new types of errors that arise with concurrency that much harder to find, anticipate, and prevent. These include deadlock, livelock, and pointer aliasing, to name a few. It's important that programmers start writing parallel programs in order to take advantage of all that Moore's Law offers. But for this to happen, programmers need to feel confident in their ability to write safe, parallel code.
+are executing at once. This makes the new types of errors that arise with concurrency that much harder to anticipate, find, and prevent. These include deadlock, livelock, and pointer aliasing, to name a few. It's important that programmers start writing parallel programs in order to take advantage of all that Moore's Law offers, but for this to happen, programmers need to feel confident in their ability to write safe, parallel code.
 
 Highlight how writing concurrent programs is still difficult, prone to error. Rust is a new systems programming language that attempts to make writing concurrent programs easier for programmers through its type system. 
 
@@ -39,10 +39,9 @@ What metrics are we interested in?
 
 \section*{Methodology}
 
-Rust and C are inherently different in many ways unrelated to their implementations of concurrency, so we will need to isolate how each one's implementations of concurrency impact performance. We will do this in the following way.
+Rust and C are inherently different in many ways, so we will need to isolate how each one's implementations of concurrency impact performance. We will do this in the following way:
 
-We will choose a set of benchmarks that can be run both serially and parallelized. We will implement a serial and multithreaded version of each benchmark in both C and Rust. We will use the single-threaded benchmarks to
-establish a baseline comparison between the two languages. Then any further differences in performance that arise during the multithreaded tests can be conclusively attributed to each language's implementation of concurrency.
+We will choose a set of benchmarks that can be run both serially and parallelized and implement them in C and Rust. We will use the data colllected from the single-threaded benchmarks to establish a baseline for how the two languages differ. Then, any further differences in performance that arise during the multithreaded tests can be attributed to each language's implementation of concurrency.
 
 
 \section*{Equipment and Tools}
