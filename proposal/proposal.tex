@@ -32,7 +32,7 @@ Discuss Rust's concurrency constructs. Rust uses certain types to perform "extra
 
 \section*{Goal and Description}
 
-Rust's new concurrency constructs make writing concurrent code safer and easier by preventing concurrency errors at compile time. We are interested in comparing the performance of threading in Rust and in C to see if Rust's new constructs affect its peformance in anyway. In other words, Rust helps programmers write concurrent code, but at what cost to performance?
+Rust's new concurrency constructs make writing concurrent code safer and easier by preventing concurrency errors at compile time. We are interested in comparing the performance of threading in Rust and in C to see if Rust's new constructs affect its performance in anyway. In other words, Rust helps programmers write concurrent code, but at what cost to performance?
 
 What metrics are we interested in?
 
@@ -41,15 +41,34 @@ What metrics are we interested in?
 
 Rust and C are inherently different in many ways, so we will need to isolate how each one's implementations of concurrency impact performance. We will do this in the following way:
 
-We will choose a set of benchmarks that can be run both serially and parallelized and implement them in C and Rust. We will use the data colllected from the single-threaded benchmarks to establish a baseline for how the two languages differ. Then, any further differences in performance that arise during the multithreaded tests can be attributed to each language's implementation of concurrency.
+We will choose a set of benchmarks that can be run both serially and parallelized and implement them in C and Rust. We will pick a base hardware configuration either on one computer or via Sniper to run all the benchmarks on to isolate hardware related impacts. Rust benchmarks will be compiled using the Rust compiler and C benchmarks will be compiled using gcc and clang. Metrics that will be collected include size of program input and time to execute fully. We will use the data collected from the single-threaded benchmarks to establish a baseline for how the two languages compare. 
+
+We will employ the same methodology to compare C vs. Rust multithreaded performance. Metrics that will be considered include number of concurrent threads, time elapsed for program execution, and size of input in the benchmark. Consequently, any differences in performance that arise during the multithreaded tests can be attributed to each language's implementation of concurrency. 
+
+
+Furthermore, we plan on exploring the differences in performance observed using different hardware. For this section, we will execute concurrent benchmarks at different thread counts with different hardware settings such as L1/L2 cache size and cache associativity. We seek to examine if changes in relative performance between C and Rust arise when running benchmarks on different hardware. 
 
 
 \section*{Equipment and Tools}
 
 We will be writing code in C and Rust. For more convincing analysis, we will compile our C code using both clang and gcc. Rust will be compiled with the standard rustc compiler. We are still in the process of selecting a suite of benchmarks to use. Once we have chosen a set of benchmarks and ported them to Rust, we will run our simulations in the SNIPER Multi-Core Simulator \cite{Sniper} on the Linux compute servers hosted at Tufts University.
 
+%benchmark ideas:
+% matrix multiplication
+% Josh's Senior Design benchmark
+% parsec 
 
 \section*{Timeline}
+
+April 15: Completed creation of benchmarks in C and Rust and setup of testing environment.
+\\\\
+April 20: Project status discussion with Dr. Hempstead 
+\\\\
+April 22: Completed all benchmarks and collect all data
+\\\\
+April 27: Project Oral Presentation
+\\\\
+May 3:  Final Report Submission
 
 
 %%% References %%%
