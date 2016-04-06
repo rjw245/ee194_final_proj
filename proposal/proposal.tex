@@ -1,7 +1,8 @@
 %%% Setup %%%
-\documentclass{scrartcl}
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{url}
 \title{Proposal: A Comparison of Concurrency in Rust and C}
-\subtitle{Final Project for EE194}
 \author{
     Josh Pfosi\\
     \and
@@ -15,6 +16,11 @@
 %%% The Meat %%%
 
 \section*{Background}
+Computer architects today are faced with a power wall. CPU clock speeds cannot increase any further, else they will be unable to be cooled. Yet the number of transistors onchip continues to double every two years as dictated by Moore's Law, so the question to architects is this: what can we spend additional transistors on, if not clock speed? The industry has answered this question by converging on multicore computers: computers that integrate multiple processor cores into
+one chip \cite{Larus:2009}. The industry is forced to favor increased parallelism over increased speed.
+
+This shift has huge ramifications for the software industry.
+
 Talk about importance of writing concurrent programs given trends in today's architectures. Highlight how writing concurrent programs is still difficult, prone to error. Rust is a new systems programming language that attempts to make writing concurrent programs easier for programmers through its type system. 
 
 Rust is a new systems programming language which guarantees memory safety through a complex type system. 
@@ -27,11 +33,13 @@ Rust's new concurrency constructs make writing concurrent code safer and easier 
 What metrics are we interested in?
 
 \section*{Methodology}
-We anticipate that C and Rust will perform differently on our benchmarks because there are many differences between them unrelated to concurrency. We will isolate the differences in performance due to each language's implementation of concurrency in the following way. We will choose a set of benchmarks that can be both run serially and parallelized. We will implement a serial and multithreaded version of each benchmark in both C and Rust. We will use the single-threaded benchmarks to
-establish a baseline comparison between the two languages.
+Rust and C are inherently different in many ways unrelated to their implementations of concurrency, so we will need to isolate how each one's implementations of concurrency impact performance. We will do this in the following way.
+
+We will choose a set of benchmarks that can be run both serially and parallelized. We will implement a serial and multithreaded version of each benchmark in both C and Rust. We will use the single-threaded benchmarks to
+establish a baseline comparison between the two languages. Then any further differences in performance that arise during the multithreaded tests can be conclusively attributed to each language's implementation of concurrency.
 
 \section*{Equipment and Tools}
-We will be writing code 
+We will be writing code in C and Rust. For more convincing analysis, we will compile our C code using both clang and gcc. Rust will be compiled with the standard rustc compiler. We are still in the process of selecting a suite of benchmarks to use. Once we have chosen a set of benchmarks and ported them to Rust, we will run our simulations in the SNIPER Multi-Core Simulator \cite{Sniper} on the Linux compute servers hosted at Tufts University.
 
 \section*{Timeline}
 
