@@ -3,8 +3,8 @@ use std::thread;
 use std::thread::JoinHandle;
 
 fn main() {
-    let inputsize:  usize = 1000;
-    let numthreads: usize = 7;
+    let inputsize:  usize = 1000000000;
+    let numthreads: usize = 8;
     let mut thread_list: Vec<JoinHandle<i64>> = Vec::new();
     
     let input: Vec<i64> = vec![1; inputsize];
