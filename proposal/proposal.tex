@@ -63,9 +63,8 @@ trade-off between programmer productivity and performance.
 
 \section*{Methodology}
 
-Rust and C are inherently different in many ways, so we will need to isolate how
-each one's implementation of concurrency impact performance. We will do this in
-the following way:
+Rust and C differ in many ways, but we seek to isolate the effect of their
+concurrency models on performance. We will do this in the following way:
 
 We will choose a set of benchmarks that can be run both serially and
 concurrently and implement them in C and Rust. We will compare the performance
