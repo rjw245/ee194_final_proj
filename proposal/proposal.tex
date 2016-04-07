@@ -17,7 +17,7 @@ parallelism over clock frequency. This shift has significant ramifications for
 programmers. A program's performance scales trivially with clock frequency,
 whereas parallel programs oftentimes require significant design effort on the
 part of the programmer to scale well. As of now, multicore machines burden the
-programmer with efficient usage of the parallel cores. It is difficult for most
+programmer with efficient usage of the parallel cores~\cite{Sutter:2005}. It is difficult for most
 programmers to decompose an algorithm into parallel workloads and to anticipate
 all of the interactions that can occur. This proliferates new kinds of errors
 that are much harder to anticipate, find, and prevent. These include deadlock,
@@ -29,7 +29,7 @@ this task?
 
 Rust is a new systems programming language that facilitates writing safe
 concurrent programs through an advanced type system~\cite{rust-lang.org}. It
-introduces the idea of data ownership where variable bindings "own" the data to
+introduces the idea of data ownership where variable bindings ``own'' the data to
 which they point. This and other statically enforced safety features reduce the
 burden of concurrent programming on the programmer. Contrast this with other
 standard concurrent programming models such as OpenMP, \texttt{pthreads}, and C++11's
@@ -41,8 +41,8 @@ To investigate the research question, we have selected Rust and C's
 Namely, Rust, which relies on static analysis, and \texttt{pthreads}, which relies on
 programmer expertise, project-specific conventions, and manual synchronization.
 The specific contribution made by this research will be to glean whether Rust's
-strict compile-time rules and ``extra runtime book-keeping'' have an adverse
-effect on performance~\cite{rust-lang-org}.
+strict compile-time rules and ``extra runtime book-keeping''~\cite{rust-lang.org} have an adverse
+effect on performance.
 
 \section*{Goal and Description}
 
