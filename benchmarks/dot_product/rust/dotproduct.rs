@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::thread;
 
-const N: usize          = 10000000;
+const N: usize          = 100000000;
 const THREADS: usize    = 7;
 
 fn main() {
@@ -36,22 +36,19 @@ fn main() {
 }
 
 fn init_vecs(x: &mut Vec<f32>, y: &mut Vec<f32>) {
-    let mut factor = N as f32;
-    let denom_sqrd: f32 = ( 2.0 * factor * factor + 3.0 * factor + 1.0);
-    factor = 1.0 / denom_sqrd.sqrt();
-
+    //Initialize so that dot product = N
     for i in 0..x.len() {
-        x[i] = ((i+1) as f32) * factor;
-        y[i] = ((i+1) as f32) * 6.0 * factor;
+        x[i] = 4.0;
+        y[i] = 0.25;
     }
 }
 
 fn dot_prod(x: & Vec<f32>, y: & Vec<f32>, start: usize, end: usize) -> f32 {
-    let mut sum: f32 = 0.0;
+    let mut dotprod: f32 = 0.0;
     for i in start..end {
         if(i>=0 && i<x.len()) {
-            sum = sum + (x[i] * y[i]);
+            dotprod = dotprod + (x[i] * y[i]);
         }
     }
-    sum
+    dotprod
 }
