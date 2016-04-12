@@ -46,7 +46,7 @@ fn main(){
     }
 
     // // rejoin
-    thread::sleep(Duration::from_millis(10000));
+    thread::sleep(Duration::from_millis(5));
     // let mut result:
     print_matrix(&shared_a);
     println!("*");
