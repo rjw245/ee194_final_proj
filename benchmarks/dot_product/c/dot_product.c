@@ -1,209 +1,157 @@
-#include <stdlib.h>
+/*****************************************************************************
+ * FILE: mpithreads_threads.c
+ * DESCRIPTION:
+ *   This simple program illustrates the use of Pthreads in a program obtained
+ *   by modifying a serial code that performs a dot product. It is the second
+ *   of four codes used to show the progression from a serial program to a
+ *   hybrid MPI/Pthreads program.  The other relevant codes are:
+ *      - mpithreads_serial.c   - The serial version
+ *      - mpithreads_mpi.c - A distributed memory programming model with MPI
+ *      - mpithreads_both.c - A hybrid model that utilizes both MPI and
+ *          Pthreads to execute on systems that are comprised of clusters
+ *          of SMP's.
+ *   The main data is made available to all threads through a globally 
+ *   accessible structure. Each thread works on a different part of the 
+ *   data.  The main thread waits for all the threads to complete their 
+ *   computations, and then it prints the resulting sum.
+ * SOURCE: Vijay Sonnad, IBM
+ * LAST REVISED:  01/29/09 Blaise Barney
+ ******************************************************************************/
+#include <pthread.h>
 #include <stdio.h>
-#include <math.h>
-#include <omp.h>
+#include <stdlib.h>
 
-int main ( int argc, char *argv[] );
-double test01 ( int n, double x[], double y[] );
-double test02 ( int n, double x[], double y[] );
+/*   
+     The following structure contains the necessary information to allow the 
+     function "dotprod" to access its input data and place its output into 
+     the structure.  This structure is unchanged from the sequential version.
+     */
 
-/******************************************************************************/
-
-int main ( int argc, char *argv[] )
-
-/******************************************************************************/
-/*
-  Purpose:
-
-    MAIN is the main program for DOT_PRODUCT.
-
-  Discussion:
-
-    This program illustrates how a vector dot product could be set up
-    in a C program using OpenMP.
-
-  Licensing:
-
-    This code is distributed under the GNU LGPL license. 
-
-  Modified:
-
-    18 April 2009
-
-  Author:
-
-    John Burkardt
-*/
+typedef struct 
 {
-  double factor;
-  int i;
-  int n;
-  double wtime;
-  double *x;
-  double xdoty;
-  double *y;
+    double      *a;
+    double      *b;
+    double     sum; 
+    int     veclen; 
+} DOTDATA;
 
-  printf ( "\n" );
-  printf ( "DOT_PRODUCT\n" );
-  printf ( "  C/OpenMP version\n" );
-  printf ( "\n" );
-  printf ( "  A program which computes a vector dot product.\n" );
+/* Define globally accessible variables and a mutex */
 
-  printf ( "\n" );
-  printf ( "  Number of processors available = %d\n", omp_get_num_procs ( ) );
-  printf ( "  Number of threads =              %d\n", omp_get_max_threads ( ) );
+#define MAXTHRDS 8
+#define VECLEN 10000000
+
+DOTDATA dotstr; 
+pthread_t callThd[MAXTHRDS];
+pthread_mutex_t mutexsum;
+
 /*
-  Set up the vector data.
-  N may be increased to get better timing data.
+   The function dotprod is activated when the thread is created.  As before, 
+   all input to this routine is obtained from a structure of type DOTDATA and 
+   all output from this function is written into this structure. The benefit 
+   of this approach is apparent for the multi-threaded program: when a thread 
+   is created we pass a single argument to the activated function - typically 
+   this argument is a thread number. All the other information required by the 
+   function is accessed from the globally accessible structure. 
+   */
 
-  The value FACTOR is chosen so that the correct value of the dot product 
-  of X and Y is N.
-*/
-  n = 100;
+void *dotprod(void *arg)
+{
 
-  while ( n < 100000000 )
-  {
-    n = n * 10;
+    /* Define and use local variables for convenience */
 
-    x = ( double * ) malloc ( n * sizeof ( double ) );
-    y = ( double * ) malloc ( n * sizeof ( double ) );
+    int i, start, end, len ;
+    long offset;
+    double mysum, *x, *y;
+    offset = (long)arg;
 
-    factor = ( double ) ( n );
-    factor = 1.0 / sqrt ( 2.0 * factor * factor + 3 * factor + 1.0 );
+    len = dotstr.veclen;
+    start = offset*len;
+    end   = start + len;
+    x = dotstr.a;
+    y = dotstr.b;
 
-    for ( i = 0; i < n; i++ )
+    /*
+       Perform the dot product and assign result to the appropriate variable in 
+       the structure. 
+       */
+
+    mysum = 0;
+    for (i=start; i<end ; i++) 
     {
-      x[i] = ( i + 1 ) * factor;
+        mysum += (x[i] * y[i]);
     }
 
-    for ( i = 0; i < n; i++ )
-    {
-      y[i] = ( i + 1 ) * 6 * factor;
+    /*
+       Lock a mutex prior to updating the value in the shared structure, and 
+       unlock it upon updating.
+       */
+    pthread_mutex_lock (&mutexsum);
+    printf("Thread %ld adding partial sum of %f to global sum of %f\n",
+            offset, mysum, dotstr.sum);
+    dotstr.sum += mysum;
+    pthread_mutex_unlock (&mutexsum);
+
+    pthread_exit((void*) 0);
+}
+
+/* 
+   The main program creates threads which do all the work and then print out 
+   result upon completion. Before creating the threads, the input data is 
+   created. Since all threads update a shared structure, we need a mutex for 
+   mutual exclusion. The main thread needs to wait for all threads to complete, 
+   it waits for each one of the threads. We specify a thread attribute value 
+   that allow the main thread to join with the threads it creates. Note also 
+   that we free up handles  when they are no longer needed.
+   */
+
+int main ()
+{
+    long i;
+    double *a, *b;
+    void *status;
+    pthread_attr_t attr;
+
+    /* Assign storage and initialize values */
+    a = (double*) malloc (MAXTHRDS*VECLEN*sizeof(double));
+    b = (double*) malloc (MAXTHRDS*VECLEN*sizeof(double));
+
+    for (i=0; i<VECLEN*MAXTHRDS; i++) {
+        a[i]=1;
+        b[i]=a[i];
     }
 
-    printf ( "\n" );
-/*
-  Test #1
-*/
-    wtime = omp_get_wtime ( );
+    dotstr.veclen = VECLEN; 
+    dotstr.a = a; 
+    dotstr.b = b; 
+    dotstr.sum=0;
 
-    xdoty = test01 ( n, x, y );
+    pthread_mutex_init(&mutexsum, NULL);
 
-    wtime = omp_get_wtime ( ) - wtime;
+    /* Create threads to perform the dotproduct  */
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    printf ( "  Sequential  %8d  %14.6e  %15.10f\n", n, xdoty, wtime );
-/*
-  Test #2
-*/
-    wtime = omp_get_wtime ( );
+    for(i=0;i<MAXTHRDS;i++) {
+        /* Each thread works on a different set of data.
+           The offset is specified by 'i'. The size of
+           the data for each thread is indicated by VECLEN.
+           */
+        pthread_create( &callThd[i], &attr, dotprod, (void *)i); 
+    }
 
-    xdoty = test02 ( n, x, y );
+    pthread_attr_destroy(&attr);
 
-    wtime = omp_get_wtime ( ) - wtime;
+    /* Wait on the other threads */
+    for(i=0;i<MAXTHRDS;i++) {
+        pthread_join( callThd[i], &status);
+    }
 
-    printf ( "  Parallel    %8d  %14.6e  %15.10f\n", n, xdoty, wtime );
-  
-    free ( x );
-    free ( y );
-  }
-/*
-  Terminate.
-*/
-  printf ( "\n" );
-  printf ( "DOT_PRODUCT\n" );
-  printf ( "  Normal end of execution.\n" );
+    /* After joining, print out the results and cleanup */
+    printf ("Done. Threaded version: sum =  %f \n", dotstr.sum);
+    free (a);
+    free (b);
+    pthread_mutex_destroy(&mutexsum);
+    pthread_exit(NULL);
 
-  return 0;
-}
-/******************************************************************************/
-
-double test01 ( int n, double x[], double y[] )
-
-/******************************************************************************/
-/*
-  Purpose:
-
-    TEST01 computes the dot product with no parallel processing directives.
-
-  Licensing:
-
-    This code is distributed under the GNU LGPL license. 
-
-  Modified:
-
-    05 April 2008
-
-  Author:
-
-    John Burkardt
-
-  Parameters:
-
-    Input, int N, the order of the vectors.
-
-    Input, double X[N], Y[N], the vectors.
-
-    Output, double TEST01, the dot product of X and Y.
-*/
-{
-  int i;
-  double xdoty;
-
-  xdoty = 0.0;
-
-  for ( i = 0; i < n; i++ )
-  {
-    xdoty = xdoty + x[i] * y[i];
-  }
-
-  return xdoty;
-}
-/******************************************************************************/
-
-double test02 ( int n, double x[], double y[] )
-
-/******************************************************************************/
-/*
-  Purpose:
-
-    TEST02 computes the dot product with parallel processing directives.
-
-  Licensing:
-
-    This code is distributed under the GNU LGPL license. 
-
-  Modified:
-
-    05 April 2008
-
-  Author:
-
-    John Burkardt
-
-  Parameters:
-
-    Input, int N, the order of the vectors.
-
-    Input, double X[N], Y[N], the vectors.
-
-    Output, double TEST02, the dot product of X and Y.
-*/
-{
-  int i;
-  double xdoty;
-
-  xdoty = 0.0;
-
-# pragma omp parallel \
-  shared ( n, x, y ) \
-  private ( i )
-
-# pragma omp for reduction ( + : xdoty )
-
-  for ( i = 0; i < n; i++ )
-  {
-    xdoty = xdoty + x[i] * y[i];
-  }
-
-  return xdoty;
+    return 0;
 }
