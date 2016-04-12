@@ -1,17 +1,32 @@
-const TOTAL_SIZE:       usize = 10;
-const NTHREADS:         usize = 4;
+//Concurrency modules
+use std::sync::Arc;
+use std::thread;
+use std::thread::JoinHandle;
+
+const TOTAL_SIZE:       usize = 16;
+const NTHREADS:         usize = 1;
 
 fn main(){
-    let mut a : Vec<Vec<f32>> = Vec::new(); 
-    let mut b : Vec<Vec<f32>> = Vec::new(); 
-    let mut c : Vec<Vec<f32>> = Vec::new(); 
+    let mut thread_list: Vec<JoinHandle<i64>> = Vec::new();
+
+
+
+
+    let mut a : Vec<Vec<f32>> = Vec::new();
+    let mut b : Vec<Vec<f32>> = Vec::new();
+    let mut c : Vec<Vec<f32>> = Vec::new();
 
     init_matrix(&mut a, TOTAL_SIZE);
     init_matrix(&mut b, TOTAL_SIZE);
     init_matrix(&mut c, TOTAL_SIZE);
+
+    //split into separate threads
+
     for t in 0..NTHREADS {
         multiply(&a, &b, &mut c, t);
     }
+
+    //rejoin
 
     print_matrix(&a);
     println!("*");
