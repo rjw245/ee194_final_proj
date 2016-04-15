@@ -10,4 +10,4 @@ simple: simple.o libsimple.a
 	rustc simple.rs
 
 clean:
-	rm simple.o libsimple.a simple
+	rm simple.o libsimple.a simple simple.0.o simple.metadata.o
