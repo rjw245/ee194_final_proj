@@ -6,7 +6,7 @@ simple.o:
 libsimple.a: simple.o
 	ar rcs libsimple.a simple.o
 
-simple: simple.o libsimple.a
+simple: libsimple.a
 	rustc simple.rs
 
 clean:

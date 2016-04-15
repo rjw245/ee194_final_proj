@@ -64,8 +64,15 @@ $(TARGET): clean $(CSRC)
 $(M4_SRC): $(SRC)
 	$(M4) $(M4_BASE)/$(MACROS) $< > $@
 
+lib: blackscholes.o
+	ar -rcs bs.a blackscholes.o
+
+blackscholes.o:
+	gcc -c blackscholes.c -o blackscholes.o
+
+
 clean:
-	rm -f $(TARGET) $(M4_SRC)
+	rm -f $(TARGET) blackscholes.o bs.a $(M4_SRC)
 
 install:
 	mkdir -p $(PREFIX)/bin
