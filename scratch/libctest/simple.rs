@@ -1,8 +1,10 @@
+#![feature(link_args)]
 #![feature(libc)]
 extern crate libc;
 use libc::c_int;
 
-#[link(name = "simple")]
+#[link_args = "-L./ -lsimple"]
+#[link(name = "simple", kind="static")]
 extern {
     fn add(a: c_int, b: c_int) -> c_int;
 }
