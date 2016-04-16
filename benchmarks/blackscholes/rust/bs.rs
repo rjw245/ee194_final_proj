@@ -1,21 +1,21 @@
-// #![feature(link_args)]
-// #![feature(libc)]
+#![feature(link_args)]
+#![feature(libc)]
 
-
-// extern crate libc;
-// use libc::c_int;
-// use libc::c_float;
+extern crate libc;
+use libc::c_int;
+use libc::c_float;
 use std::fs::File;
+use std::io::prelude::*;
 use std::io::{self, BufReader};
 
-// #[link_args = "-L./ -lbs"]
-// #[link(name = "bs", kind="static")]
+#[link_args = "-L./ -lbs"]
+#[link(name = "bs", kind="static")]
 
-// extern {
-//     fn BlkSchlsEqEuroNoDiv( sptprice: c_float,
-//                             strike: c_float, rate: c_float, volatility: c_float,
-//                             time: c_float, otype: c_int, timet: c_float ) -> c_float;
-// }
+extern {
+    fn BlkSchlsEqEuroNoDiv( sptprice: c_float,
+                            strike: c_float, rate: c_float, volatility: c_float,
+                            time: c_float, otype: c_int, timet: c_float ) -> c_float;
+}
 
 struct TestParams {
     otype: c_int,
@@ -27,7 +27,7 @@ struct TestParams {
 }
 
 fn main(){
-    let testpath = "input.txt";
+    let testpath = "../inputs/in_4K.txt";
     let mut tests: Vec<TestParams> = Vec::new();
     loadTestData(&mut tests, testpath);
     // let sptprice: c_float = 1.0;
@@ -43,15 +43,26 @@ fn main(){
     // }
 }
 
-fn loadTestData(tests: &mut Vec<TestParams>, testpath: String) {
-    let testfile = try!(File::open(testpath));
-    let testfile = BufReader::new(f);
-    for test in testfile.lines() {
-        let numbers: Vec<f32> = test.splite_whitespace()
-            .map(|s| s.parse().unwrap())
-            .collect();
-        for num in numbers {
-            println!("{}",num);
+fn loadTestData(tests: &mut Vec<TestParams>, testpath: & str) {
+    let testfile = BufReader::new(File::open(testpath).unwrap());
+    for test2 in testfile.lines() {
+        let test = test2.unwrap();
+        let params = test.split_whitespace();
+        let params: Vec<&str> = params.collect();
+        if params.len()>1 {
+            let otype_val = 0;
+            if params[6]=="P" {
+                let otype_val = 1;
+            }
+            let test_params = TestParams{
+                otype: otype_val as c_int,
+                sptprice: params[0].parse::<f32>().unwrap(),
+                strike: params[1].parse::<f32>().unwrap(),
+                rate: params[2].parse::<f32>().unwrap(),
+                volatility: params[4].parse::<f32>().unwrap(),
+                otime: params[5].parse::<f32>().unwrap(),
+            };
+
         }
     }
 }
