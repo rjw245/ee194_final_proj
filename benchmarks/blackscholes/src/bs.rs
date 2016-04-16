@@ -5,7 +5,7 @@ extern crate libc;
 use libc::c_int;
 use libc::c_float;
 
-//const NLOOPS: usize = 100000000;
+const NLOOPS: usize = 100000000;
 
 #[link_args = "-L./ -lbs"]
 #[link(name = "bs", kind="static")]
@@ -17,16 +17,16 @@ extern {
 }
 
 fn main(){
-    //for i in 0..NLOOPS {
-    let sptprice: c_float = 0.0;
-    let strike: c_float = 0.0;
-    let rate: c_float = 0.0;
-    let volatility: c_float = 0.0;
-    let time: c_float = 0.0;
-    let otype: c_int = 0;
-    let timet: c_float = 0.0;
-    let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
-    println!("{}",s);
-    //}
+    let sptprice: c_float = 1.0;
+    let strike: c_float = 1.0;
+    let rate: c_float = 1.0;
+    let volatility: c_float = 1.0;
+    let time: c_float = 1.0;
+    let otype: c_int = 1;
+    let timet: c_float = 1.0;
+    for i in 0..NLOOPS {
+        let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+        // println!("{}",s);
+    }
 }
 
