@@ -1,0 +1,9 @@
+[PARSEC] [========== PARSEC 3.0-beta-20150206 BUILD LOGFILE ==========]
+
+[PARSEC] Build i686-linux.gcc started on Sat Apr 16 13:43:07 EDT 2016.
+[PARSEC] Packages to build:  parsec.blackscholes
+
+[PARSEC] [========== Building package parsec.blackscholes [1] ==========]
+[PARSEC] [---------- Analyzing package parsec.blackscholes ----------]
+[PARSEC] Package parsec.blackscholes already exists, proceeding.
+[PARSEC] Done.
