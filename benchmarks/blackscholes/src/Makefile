@@ -70,9 +70,11 @@ lib: bs.o
 bs.o:
 	gcc -c bs.c -o bs.o -fPIC
 
+rust: lib
+	rustc bs.rs
 
 clean:
-	rm -f $(TARGET) bs.o libbs.a $(M4_SRC)
+	rm -f $(TARGET) bs bs.o libbs.a $(M4_SRC)
 
 install:
 	mkdir -p $(PREFIX)/bin
