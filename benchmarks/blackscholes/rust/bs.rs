@@ -27,20 +27,20 @@ struct TestParams {
 }
 
 fn main(){
-    let testpath = "../inputs/in_4K.txt";
+    let testpath = "../inputs/in_4.txt";
     let mut tests: Vec<TestParams> = Vec::new();
     loadTestData(&mut tests, testpath);
-    // let sptprice: c_float = 1.0;
-    // let strike: c_float = 1.0;
-    // let rate: c_float = 1.0;
-    // let volatility: c_float = 1.0;
-    // let time: c_float = 1.0;
-    // let otype: c_int = 1;
-    // let timet: c_float = 1.0;
-    // for i in 0..NLOOPS {
-    //     let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
-    //     // println!("{}",s);
-    // }
+    for test in tests {
+        let sptprice: c_float = test.sptprice;
+        let strike: c_float = test.strike;
+        let rate: c_float = test.rate;
+        let volatility: c_float = test.volatility;
+        let time: c_float = test.otime;
+        let otype: c_int = test.otype;
+        let timet: c_float = 0.0;
+        let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+        println!("{}",s);
+    }
 }
 
 fn loadTestData(tests: &mut Vec<TestParams>, testpath: & str) {
@@ -50,9 +50,9 @@ fn loadTestData(tests: &mut Vec<TestParams>, testpath: & str) {
         let params = test.split_whitespace();
         let params: Vec<&str> = params.collect();
         if params.len()>1 {
-            let otype_val = 0;
+            let mut otype_val = 0;
             if params[6]=="P" {
-                let otype_val = 1;
+                otype_val = 1;
             }
             let test_params = TestParams{
                 otype: otype_val as c_int,
@@ -62,6 +62,7 @@ fn loadTestData(tests: &mut Vec<TestParams>, testpath: & str) {
                 volatility: params[4].parse::<f32>().unwrap(),
                 otime: params[5].parse::<f32>().unwrap(),
             };
+            tests.push(test_params);
 
         }
     }
