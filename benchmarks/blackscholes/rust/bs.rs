@@ -7,6 +7,7 @@ use libc::c_float;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
+use std::sync::Arc;
 
 #[link_args = "-L./ -lbs"]
 #[link(name = "bs", kind="static")]
@@ -16,6 +17,8 @@ extern {
                             strike: c_float, rate: c_float, volatility: c_float,
                             time: c_float, otype: c_int, timet: c_float ) -> c_float;
 }
+
+const NTHREADS: usize = 4;
 
 struct TestParams {
     otype: c_int,
@@ -30,16 +33,25 @@ fn main(){
     let testpath = "../inputs/in_4.txt";
     let mut tests: Vec<TestParams> = Vec::new();
     loadTestData(&mut tests, testpath);
-    for test in tests {
-        let sptprice: c_float = test.sptprice;
-        let strike: c_float = test.strike;
-        let rate: c_float = test.rate;
-        let volatility: c_float = test.volatility;
-        let time: c_float = test.otime;
-        let otype: c_int = test.otype;
-        let timet: c_float = 0.0;
-        let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
-        println!("{}",s);
+    let tests_arc = Arc::new(tests);
+    for threadnum in 0..NTHREADS {
+        let tests_copy = tests_arc.clone();
+        let start = threadnum*tests_copy.len();
+        let mut end = (threadnum+1)*tests_copy.len();
+        if end > tests_copy.len() {
+            end = tests_copy.len();
+        }
+        for testnum in start..end {
+            let sptprice: c_float = tests_copy[testnum].sptprice;
+            let strike: c_float = tests_copy[testnum].strike;
+            let rate: c_float = tests_copy[testnum].rate;
+            let volatility: c_float = tests_copy[testnum].volatility;
+            let time: c_float = tests_copy[testnum].otime;
+            let otype: c_int = tests_copy[testnum].otype;
+            let timet: c_float = 0.0;
+            let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+            println!("{}",s);
+        }
     }
 }
 
