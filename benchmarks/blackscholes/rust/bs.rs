@@ -19,6 +19,7 @@ extern {
 }
 
 const NTHREADS: usize = 4;
+const testpath: &'static str = "../inputs/in_64K.txt";
 
 struct TestParams {
     otype: c_int,
@@ -30,7 +31,6 @@ struct TestParams {
 }
 
 fn main(){
-    let testpath = "../inputs/in_4.txt";
     let mut tests: Vec<TestParams> = Vec::new();
     loadTestData(&mut tests, testpath);
     let tests_arc = Arc::new(tests);
@@ -50,13 +50,13 @@ fn main(){
             let otype: c_int = tests_copy[testnum].otype;
             let timet: c_float = 0.0;
             let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
-            println!("{}",s);
+            // println!("{}",s);
         }
     }
 }
 
-fn loadTestData(tests: &mut Vec<TestParams>, testpath: & str) {
-    let testfile = BufReader::new(File::open(testpath).unwrap());
+fn loadTestData(tests: &mut Vec<TestParams>, path_to_test: & str) {
+    let testfile = BufReader::new(File::open(path_to_test).unwrap());
     for test2 in testfile.lines() {
         let test = test2.unwrap();
         let params = test.split_whitespace();
