@@ -35,10 +35,13 @@ struct TestParams {
 fn main(){
     let args: Vec<String> = env::args().collect();
     let NTHREADS: usize = args[1].parse::<usize>().unwrap();
+    println!("Num threads: {}", NTHREADS);
     let ref testpath = args[2];
 
     let mut tests: Vec<TestParams> = Vec::new();
     loadTestData(&mut tests, testpath);
+
+    let mut threads = Vec::new();
     if NTHREADS>1 { 
         let tests_arc = Arc::new(tests);
         for threadnum in 0..NTHREADS {
@@ -48,7 +51,8 @@ fn main(){
             if end > tests_copy.len() {
                 end = tests_copy.len();
             }
-            thread::spawn(move || {
+            let handle = thread::spawn(move || {
+                println!("Spawned thread");
                 for testnum in start..end {
                     let sptprice: c_float = tests_copy[testnum].sptprice;
                     let strike: c_float = tests_copy[testnum].strike;
@@ -58,10 +62,14 @@ fn main(){
                     let otype: c_int = tests_copy[testnum].otype;
                     let timet: c_float = 0.0;
                     let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
-                    // println!("{}",s);
                 }
             });
+            threads.push(handle);
         }
+        for t in threads {
+            t.join();
+        }
+
     } else {
         let start=0; let end=tests.len();
         for testnum in start..end {
