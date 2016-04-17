@@ -1,2 +1,2 @@
 all:
-	gcc -Wall -Wextra -lpthread dot_product.c -o dot_product
+	gcc -Wall -Wextra -DNTHREADS=$$NT -lpthread dot_product.c -o dot_product
