@@ -9,6 +9,7 @@ use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::sync::Arc;
 use std::thread;
+use std::env;
 
 #[link_args = "-L./ -lbs"]
 #[link(name = "bs", kind="static")]
@@ -19,8 +20,8 @@ extern {
                             time: c_float, otype: c_int, timet: c_float ) -> c_float;
 }
 
-const NTHREADS: usize = 1;
-const testpath: &'static str = "../inputs/in_64K.txt";
+// const NTHREADS: usize = 1;
+// const testpath: &'static str = "../inputs/in_64K.txt";
 
 struct TestParams {
     otype: c_int,
@@ -32,6 +33,10 @@ struct TestParams {
 }
 
 fn main(){
+    let args: Vec<String> = env::args().collect();
+    let NTHREADS: usize = args[1].parse::<usize>().unwrap();
+    let ref testpath = args[2];
+
     let mut tests: Vec<TestParams> = Vec::new();
     loadTestData(&mut tests, testpath);
     if NTHREADS>1 { 
@@ -73,7 +78,7 @@ fn main(){
     }
 }
 
-fn loadTestData(tests: &mut Vec<TestParams>, path_to_test: & str) {
+fn loadTestData(tests: &mut Vec<TestParams>, path_to_test: & String ) {
     let testfile = BufReader::new(File::open(path_to_test).unwrap());
     for test2 in testfile.lines() {
         let test = test2.unwrap();
