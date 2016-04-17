@@ -38,7 +38,7 @@ fn main(){
     println!("Num threads: {}", NTHREADS);
     let ref testpath = args[2];
 
-    let mut tests: Vec<TestParams> = Vec::new();
+    let mut tests: Vec<TestParams> = Vec::with_capacity(100000000);
     loadTestData(&mut tests, testpath);
 
     let mut threads = Vec::new();
