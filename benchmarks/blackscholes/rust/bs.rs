@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::sync::Arc;
+use std::thread;
 
 #[link_args = "-L./ -lbs"]
 #[link(name = "bs", kind="static")]
@@ -18,7 +19,7 @@ extern {
                             time: c_float, otype: c_int, timet: c_float ) -> c_float;
 }
 
-const NTHREADS: usize = 4;
+const NTHREADS: usize = 1;
 const testpath: &'static str = "../inputs/in_64K.txt";
 
 struct TestParams {
@@ -33,23 +34,40 @@ struct TestParams {
 fn main(){
     let mut tests: Vec<TestParams> = Vec::new();
     loadTestData(&mut tests, testpath);
-    let tests_arc = Arc::new(tests);
-    for threadnum in 0..NTHREADS {
-        let tests_copy = tests_arc.clone();
-        let start = threadnum*tests_copy.len();
-        let mut end = (threadnum+1)*tests_copy.len();
-        if end > tests_copy.len() {
-            end = tests_copy.len();
+    if NTHREADS>1 { 
+        let tests_arc = Arc::new(tests);
+        for threadnum in 0..NTHREADS {
+            let tests_copy = tests_arc.clone();
+            let start = threadnum*tests_copy.len();
+            let mut end = (threadnum+1)*tests_copy.len();
+            if end > tests_copy.len() {
+                end = tests_copy.len();
+            }
+            thread::spawn(move || {
+                for testnum in start..end {
+                    let sptprice: c_float = tests_copy[testnum].sptprice;
+                    let strike: c_float = tests_copy[testnum].strike;
+                    let rate: c_float = tests_copy[testnum].rate;
+                    let volatility: c_float = tests_copy[testnum].volatility;
+                    let time: c_float = tests_copy[testnum].otime;
+                    let otype: c_int = tests_copy[testnum].otype;
+                    let timet: c_float = 0.0;
+                    let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+                    // println!("{}",s);
+                }
+            });
         }
+    } else {
+        let start=0; let end=tests.len();
         for testnum in start..end {
-            let sptprice: c_float = tests_copy[testnum].sptprice;
-            let strike: c_float = tests_copy[testnum].strike;
-            let rate: c_float = tests_copy[testnum].rate;
-            let volatility: c_float = tests_copy[testnum].volatility;
-            let time: c_float = tests_copy[testnum].otime;
-            let otype: c_int = tests_copy[testnum].otype;
+            let sptprice: c_float = tests[testnum].sptprice;
+            let strike: c_float = tests[testnum].strike;
+            let rate: c_float = tests[testnum].rate;
+            let volatility: c_float = tests[testnum].volatility;
+            let time: c_float = tests[testnum].otime;
+            let otype: c_int = tests[testnum].otype;
             let timet: c_float = 0.0;
-            let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+            let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility,   time, otype, timet ) };
             // println!("{}",s);
         }
     }
@@ -75,7 +93,6 @@ fn loadTestData(tests: &mut Vec<TestParams>, path_to_test: & str) {
                 otime: params[5].parse::<f32>().unwrap(),
             };
             tests.push(test_params);
-
         }
     }
 }
