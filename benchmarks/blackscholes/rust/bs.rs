@@ -4,8 +4,10 @@
 extern crate libc;
 use libc::c_int;
 use libc::c_float;
-
-const NLOOPS: usize = 100000000;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::{self, BufReader};
+use std::sync::Arc;
 
 #[link_args = "-L./ -lbs"]
 #[link(name = "bs", kind="static")]
@@ -16,17 +18,66 @@ extern {
                             time: c_float, otype: c_int, timet: c_float ) -> c_float;
 }
 
+const NTHREADS: usize = 4;
+const testpath: &'static str = "../inputs/in_64K.txt";
+
+struct TestParams {
+    otype: c_int,
+    sptprice: c_float,
+    strike: c_float,
+    rate: c_float,
+    volatility: c_float,
+    otime: c_float,
+}
+
 fn main(){
-    let sptprice: c_float = 1.0;
-    let strike: c_float = 1.0;
-    let rate: c_float = 1.0;
-    let volatility: c_float = 1.0;
-    let time: c_float = 1.0;
-    let otype: c_int = 1;
-    let timet: c_float = 1.0;
-    for i in 0..NLOOPS {
-        let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
-        // println!("{}",s);
+    let mut tests: Vec<TestParams> = Vec::new();
+    loadTestData(&mut tests, testpath);
+    let tests_arc = Arc::new(tests);
+    for threadnum in 0..NTHREADS {
+        let tests_copy = tests_arc.clone();
+        let start = threadnum*tests_copy.len();
+        let mut end = (threadnum+1)*tests_copy.len();
+        if end > tests_copy.len() {
+            end = tests_copy.len();
+        }
+        for testnum in start..end {
+            let sptprice: c_float = tests_copy[testnum].sptprice;
+            let strike: c_float = tests_copy[testnum].strike;
+            let rate: c_float = tests_copy[testnum].rate;
+            let volatility: c_float = tests_copy[testnum].volatility;
+            let time: c_float = tests_copy[testnum].otime;
+            let otype: c_int = tests_copy[testnum].otype;
+            let timet: c_float = 0.0;
+            let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+            // println!("{}",s);
+        }
     }
 }
+
+fn loadTestData(tests: &mut Vec<TestParams>, path_to_test: & str) {
+    let testfile = BufReader::new(File::open(path_to_test).unwrap());
+    for test2 in testfile.lines() {
+        let test = test2.unwrap();
+        let params = test.split_whitespace();
+        let params: Vec<&str> = params.collect();
+        if params.len()>1 {
+            let mut otype_val = 0;
+            if params[6]=="P" {
+                otype_val = 1;
+            }
+            let test_params = TestParams{
+                otype: otype_val as c_int,
+                sptprice: params[0].parse::<f32>().unwrap(),
+                strike: params[1].parse::<f32>().unwrap(),
+                rate: params[2].parse::<f32>().unwrap(),
+                volatility: params[4].parse::<f32>().unwrap(),
+                otime: params[5].parse::<f32>().unwrap(),
+            };
+            tests.push(test_params);
+
+        }
+    }
+}
+
 
