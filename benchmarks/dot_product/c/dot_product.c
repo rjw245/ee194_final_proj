@@ -37,7 +37,7 @@ typedef struct
 
 /* Define globally accessible variables and a mutex */
 
-#define VECLEN 1000000000
+#define VECLEN 1048576
 
 DOTDATA dotstr; 
 pthread_t callThd[NTHREADS];
