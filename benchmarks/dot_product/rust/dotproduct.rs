@@ -1,10 +1,12 @@
 use std::sync::Arc;
 use std::thread;
+use std::env;
 
-const N: usize          = 100000000;
-const THREADS: usize    = 7;
+const N: usize          = 1048576;
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    let THREADS: usize = args[1].parse::<usize>().unwrap();
 
     let mut x: Vec<f32> = vec![0.0; N];
     let mut y: Vec<f32> = vec![0.0; N];
