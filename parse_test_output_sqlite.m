@@ -10,9 +10,9 @@ values = values(cellfun(@(x) strcmp(x,'stop'), {values.prefixname}));
 
 objectnames = unique(extractfield(values,'objectname'));
 
-set(0,'DefaultFigureWindowStyle','docked')
+set(0,'DefaultFigureWindowStyle','docked');
 for object=objectnames
-    object_fig = figure('WindowStyle','normal','Name',char(object));
+    object_fig = figure('WindowStyle','normal','Name',char([char(strcat(PathName,FileName)),': ',char(object)]));
     object_tabgroup = uitabgroup(object_fig);
     ObjectData = values(cellfun(@(x) strcmp(x,object), {values.objectname}));
     metricnames = unique(extractfield(ObjectData,'metricname'));
