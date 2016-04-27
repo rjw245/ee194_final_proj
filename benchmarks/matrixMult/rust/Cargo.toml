@@ -1,0 +1,8 @@
+[package]
+name = "matrixMultiply"
+version = "0.1.0"
+authors = ["Riley Wood <rjw245@gmail.com>"]
+
+[dependencies]
+crossbeam = "0.2.5"
+
