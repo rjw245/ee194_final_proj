@@ -1,14 +1,36 @@
+#![feature(link_args)]
+#![feature(libc)]
+
 //Concurrency modules
+extern crate libc;
+use libc::c_int;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Duration;
 use std::env;
 
+#[link_args = "-L./src/ -lsniper_roi"]
+
+#[link(name = "sniper_roi", kind="static")]
+
 extern crate crossbeam;
 use crossbeam::Scope;
 
-const TOTAL_SIZE:       usize = 1024;
+extern {
+    fn SimRoiStart_wrapper();
+}
+
+extern {
+    fn SimRoiEnd_wrapper();
+}
+
+extern {
+    fn SimMarker_wrapper(arg0: c_int, arg1: c_int);
+}
+
+
+const TOTAL_SIZE:       usize = 512;
 
 fn main(){
     let args: Vec<String> = env::args().collect();
@@ -25,6 +47,9 @@ fn main(){
 
     // split into separate scoped threads
     let mut t = 0;
+
+    unsafe{ SimRoiStart_wrapper(); }
+    
     if NTHREADS==1 {
         let from = 0;
         let to   = TOTAL_SIZE;
@@ -64,7 +89,8 @@ fn main(){
             }
         });
     }
-
+    
+    unsafe{ SimRoiEnd_wrapper(); }
 
     // print_matrix(&shared_a);
     // println!("*");

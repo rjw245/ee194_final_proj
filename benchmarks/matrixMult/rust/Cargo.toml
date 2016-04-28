@@ -2,6 +2,8 @@
 name = "matrixMultiply"
 version = "0.1.0"
 authors = ["Riley Wood <rjw245@gmail.com>"]
+links = "sniper_roi"
+build = "build.rs"
 
 [dependencies]
 crossbeam = "0.2.5"
