@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "sim_api.h"
 
 #ifndef WIN32
 #include <pmmintrin.h>
@@ -507,6 +508,8 @@ int main (int argc, char **argv)
     __parsec_roi_begin();
 #endif
 
+    SimRoiStart();
+
 #ifdef ENABLE_THREADS
 #ifdef WIN32
     HANDLE *threads;
@@ -556,6 +559,8 @@ int main (int argc, char **argv)
 #ifdef ENABLE_PARSEC_HOOKS
     __parsec_roi_end();
 #endif
+
+    SimRoiEnd();
 
     //Write prices to output file
     file = fopen(outputFile, "w");
