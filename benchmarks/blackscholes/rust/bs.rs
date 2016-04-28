@@ -36,6 +36,7 @@ extern {
 
 // const NTHREADS: usize = 1;
 // const testpath: &'static str = "../inputs/in_64K.txt";
+const NUM_RUNS : usize = 100;
 
 struct TestParams {
     otype: c_int,
@@ -57,25 +58,31 @@ fn main(){
 
     let mut threads = Vec::new();
     if NTHREADS>1 { 
+        unsafe{ SimRoiStart_wrapper() };
         let tests_arc = Arc::new(tests);
         for threadnum in 0..NTHREADS {
             let tests_copy = tests_arc.clone();
-            let start = threadnum*tests_copy.len();
-            let mut end = (threadnum+1)*tests_copy.len();
-            if end > tests_copy.len() {
-                end = tests_copy.len();
+            let num_tests = tests_copy.len();
+            let start = threadnum*(num_tests / NTHREADS);
+            let mut end = (threadnum+1)*(num_tests / NTHREADS);
+            if end > num_tests {
+                end = num_tests;
             }
             let handle = thread::spawn(move || {
                 // println!("Spawned thread");
-                for testnum in start..end {
-                    let sptprice: c_float = tests_copy[testnum].sptprice;
-                    let strike: c_float = tests_copy[testnum].strike;
-                    let rate: c_float = tests_copy[testnum].rate;
-                    let volatility: c_float = tests_copy[testnum].volatility;
-                    let time: c_float = tests_copy[testnum].otime;
-                    let otype: c_int = tests_copy[testnum].otype;
-                    let timet: c_float = 0.0;
-                    let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+                // println!("start: {}   end: {}\n",start,end);
+                for run in 0..NUM_RUNS {    
+                    for testnum in start..end {
+                        let sptprice: c_float = tests_copy[testnum].sptprice;
+                        let strike: c_float = tests_copy[testnum].strike;
+                        let rate: c_float = tests_copy[testnum].rate;
+                        let volatility: c_float = tests_copy[testnum].volatility;
+                        let time: c_float = tests_copy[testnum].otime;
+                        let otype: c_int = tests_copy[testnum].otype;
+                        let timet: c_float = 0.0;
+                        let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility, time, otype, timet ) };
+                        // println!("Thread {} running test {}",threadnum,testnum);
+                    }
                 }
             });
             threads.push(handle);
@@ -83,22 +90,25 @@ fn main(){
         for t in threads {
             t.join();
         }
+        unsafe{ SimRoiEnd_wrapper() };
 
     } else {
+        unsafe{ SimRoiStart_wrapper() };
         let start=0; let end=tests.len();
-        for testnum in start..end {
-            let sptprice: c_float = tests[testnum].sptprice;
-            let strike: c_float = tests[testnum].strike;
-            let rate: c_float = tests[testnum].rate;
-            let volatility: c_float = tests[testnum].volatility;
-            let time: c_float = tests[testnum].otime;
-            let otype: c_int = tests[testnum].otype;
-            let timet: c_float = 0.0;
-            unsafe{ SimMarker_wrapper(1,123) };
-            let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility,   time, otype, timet ) };
-            unsafe{ SimMarker_wrapper(2,123) };
-            // println!("{}",s);
+        for run in 0..NUM_RUNS {
+            for testnum in start..end {
+                let sptprice: c_float = tests[testnum].sptprice;
+                let strike: c_float = tests[testnum].strike;
+                let rate: c_float = tests[testnum].rate;
+                let volatility: c_float = tests[testnum].volatility;
+                let time: c_float = tests[testnum].otime;
+                let otype: c_int = tests[testnum].otype;
+                let timet: c_float = 0.0;
+                let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility,   time, otype, timet ) };
+                // println!("{}",s);
+            }
         }
+        unsafe{ SimRoiEnd_wrapper() };
     }
 }
 
