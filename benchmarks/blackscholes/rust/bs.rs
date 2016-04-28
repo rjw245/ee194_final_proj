@@ -11,14 +11,28 @@ use std::sync::Arc;
 use std::thread;
 use std::env;
 
-#[link_args = "-L./ -lbs"]
+#[link_args = "-L./ -lbs -lsniper_roi"]
 #[link(name = "bs", kind="static")]
+#[link(name = "sniper_roi", kind="static")]
 
 extern {
     fn BlkSchlsEqEuroNoDiv( sptprice: c_float,
                             strike: c_float, rate: c_float, volatility: c_float,
                             time: c_float, otype: c_int, timet: c_float ) -> c_float;
 }
+
+extern {
+    fn SimRoiStart_wrapper();
+}
+
+extern {
+    fn SimRoiEnd_wrapper();
+}
+
+extern {
+    fn SimMarker_wrapper(arg0: c_int, arg1: c_int);
+}
+
 
 // const NTHREADS: usize = 1;
 // const testpath: &'static str = "../inputs/in_64K.txt";
@@ -35,7 +49,7 @@ struct TestParams {
 fn main(){
     let args: Vec<String> = env::args().collect();
     let NTHREADS: usize = args[1].parse::<usize>().unwrap();
-    println!("Num threads: {}", NTHREADS);
+    // println!("Num threads: {}", NTHREADS);
     let ref testpath = args[2];
 
     let mut tests: Vec<TestParams> = Vec::with_capacity(100000000);
@@ -52,7 +66,7 @@ fn main(){
                 end = tests_copy.len();
             }
             let handle = thread::spawn(move || {
-                println!("Spawned thread");
+                // println!("Spawned thread");
                 for testnum in start..end {
                     let sptprice: c_float = tests_copy[testnum].sptprice;
                     let strike: c_float = tests_copy[testnum].strike;
@@ -80,7 +94,9 @@ fn main(){
             let time: c_float = tests[testnum].otime;
             let otype: c_int = tests[testnum].otype;
             let timet: c_float = 0.0;
+            unsafe{ SimMarker_wrapper(1,123) };
             let s = unsafe{ BlkSchlsEqEuroNoDiv(sptprice, strike, rate, volatility,   time, otype, timet ) };
+            unsafe{ SimMarker_wrapper(2,123) };
             // println!("{}",s);
         }
     }

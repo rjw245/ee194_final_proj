@@ -64,17 +64,24 @@ $(TARGET): clean $(CSRC)
 $(M4_SRC): $(SRC)
 	$(M4) $(M4_BASE)/$(MACROS) $< > $@
 
-lib: bs.o
+lsniper_roi: sniper_roi.o
+	ar -rcs libsniper_roi.a sniper_roi.o
+
+lbs: bs.o
 	ar -rcs libbs.a bs.o
 
-bs.o:
+bs.o: bs.c
 	gcc -c bs.c -o bs.o -fPIC
 
-rust: lib
+sniper_roi.o: sniper_roi.c
+	gcc -c sniper_roi.c -o sniper_roi.o -fPIC
+
+
+rust: lbs lsniper_roi
 	rustc bs.rs
 
 clean:
-	rm -f $(TARGET) bs bs.o libbs.a $(M4_SRC)
+	rm -f $(TARGET) bs bs.o sniper_roi.o libbs.a libsniper_roi.a $(M4_SRC)
 
 install:
 	mkdir -p $(PREFIX)/bin
