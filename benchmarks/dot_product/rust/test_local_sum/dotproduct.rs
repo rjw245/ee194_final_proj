@@ -1,7 +1,21 @@
-use std::sync::{Arc, Mutex};
+#![feature(link_args)]
+
+use std::sync::{Arc};
 use std::thread;
 use std::env;
 use std::thread::JoinHandle;
+
+#[link_args = "-L./ -lsniper_roi"]
+#[link(name = "sniper_roi", kind="static")]
+
+extern {
+    fn SimRoiStart_wrapper();
+}
+
+extern {
+    fn SimRoiEnd_wrapper();
+}
+
 const N: usize          = 1048576;
 
 fn main() {
@@ -12,6 +26,7 @@ fn main() {
     let mut y: Vec<f64> = vec![0.0; N];
     init_vecs(&mut x, &mut y);
     
+    unsafe { SimRoiStart_wrapper(); };
     if THREADS==1 {
         let dotprod = dot_prod(&x, &y, 0, N);
         println!("{}",dotprod);
@@ -42,6 +57,7 @@ fn main() {
 
         println!("{}", global_sum);
     }
+    unsafe { SimRoiEnd_wrapper(); };
 }
 
 fn init_vecs(x: &mut Vec<f64>, y: &mut Vec<f64>) {

@@ -1,7 +1,21 @@
+#![feature(link_args)]
+
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::env;
 use std::thread::JoinHandle;
+
+#[link_args = "-L./ -lsniper_roi"]
+#[link(name = "sniper_roi", kind="static")]
+
+extern {
+    fn SimRoiStart_wrapper();
+}
+
+extern {
+    fn SimRoiEnd_wrapper();
+}
+
 const N: usize          = 1048576;
 
 fn main() {
@@ -14,6 +28,7 @@ fn main() {
     
     let dotprod = Arc::new(Mutex::new(0.0));
 
+    unsafe { SimRoiStart_wrapper(); };
     if THREADS==1 {
         let dotprod = dot_prod(&x, &y, 0, N);
         println!("{}",dotprod);
@@ -44,6 +59,7 @@ fn main() {
 
         println!("{}", *dotprod.lock().unwrap());
     }
+    unsafe { SimRoiEnd_wrapper(); };
 }
 
 fn init_vecs(x: &mut Vec<f32>, y: &mut Vec<f32>) {
