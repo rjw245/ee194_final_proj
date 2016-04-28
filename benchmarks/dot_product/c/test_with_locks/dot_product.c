@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sim_api.h>
+
 /*   
      The following structure contains the necessary information to allow the 
      function "dotprod" to access its input data and place its output into 
@@ -134,6 +136,7 @@ int main ()
     dotstr.b = b; 
     dotstr.sum = 0;
 
+    SimRoiStart();
 #if NTHREADS != 1
     void *status;
     pthread_attr_t attr;
@@ -163,6 +166,7 @@ int main ()
 #else
     dotprod((void *) 0);
 #endif
+    SimRoiEnd();
 
     /* After joining, print out the results and cleanup */
     free (a);
