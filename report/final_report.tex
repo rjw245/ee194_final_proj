@@ -1,12 +1,45 @@
 %%% Setup %%%
-%\documentclass{\twocolumn}
-\documentclass[11pt,twocolumn]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{fullpage}
-\usepackage{enumerate}
-\usepackage{graphicx}
-\usepackage{natbib}
-\usepackage[margin=1in]{geometry}
+\documentclass{article}
+\usepackage{program}
+\usepackage{acm-style10} % ACM proceedings formatting
+\usepackage{times}       % Use Adobe Times font set
+\usepackage{epsfig,twocolumn}
+\usepackage{url}
+\usepackage[english]{babel} % mdw: Required to get good hyphenation on RH6.0
+                            % (fixed in RH6.1)
+\usepackage{graphicx} 
+\graphicspath{ {figures/} }
+\usepackage{color}
+
+
+\usepackage{hyperref}
+
+
+% DO NOT EDIT THE BELOW BLOCK OF CODE
+\def\dsp{\def\baselinestretch{1.10}}
+\dsp
+\newcommand{\XXXnote}[1]{{\bf\color{red} XXX: #1}}
+\setlength{\textheight}{9.25in}
+\setlength{\columnsep}{0.33in}
+\setlength{\textwidth}{7.4in}
+\setlength{\footskip}{0.0in}
+\setlength{\topmargin}{-0.25in}
+\setlength{\headheight}{0.0in}
+\setlength{\headsep}{0.0in}
+\setlength{\oddsidemargin}{-.45in}
+\setlength{\parindent}{1pc}
+\pagestyle{empty}
+
+\usepackage{listings}
+\lstset{language=C}
+\lstset{
+	language=C,
+    frame=L,
+    captionpos=b,
+    tabsize=2,
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true
+}
 
 \title{A Comparison of Concurrency in Rust and C}
 \author{
@@ -18,27 +51,31 @@
 }
 \date{}
 
+
 \begin{document}
 \maketitle
 
 \begin{abstract}
-  Here is an abstract
+\begin{small}
+As computer architects are unable to scale clock frequency due to a power wall, parallel architectures have begun to proliferate. With this shift, programmers will need to write increasingly concurrent applications to maintain performance gains. Parallel programming is difficult for programmers and so Rust, a systems programming language, has been developed to statically guarantee memory- and thread-safety and catch common concurrency errors. This work draws comparisons between the performance of concurrency features and idioms in Rust, and the low level and distinctly unsafe implementation of Pthreads in C. We find that while Rust catches common concurrency errors and does not demonstrate additional threading overhead, it generally executes slower than C and exhibits unintuitive locking behavior.
+\end{small}
 \end{abstract}
 
 %%% The Meat %%%
 
-\section{Introduction}
-\section{Related Work}
-\section{Concurrency in C}
-\section{Concurrency in Rust}
-\section{Methodoloy}
-\section{Results}
-\section{Results}
-\section{Conclusion}
+\input{intro}
+\input{concurrency_in_c}
+\input{concurrency_in_rust}
+\input{related_work}
+\input{methodology}
+\input{results}
+\input{future_work}
+\input{conclusion}
 
 %%% References %%%
-\bibliographystyle{unsrt}
-\bibliography{final_report}
+\begin{small}
+\bibliographystyle{abbrv} \bibliography{final_report}
+\end{small}
 
 %%% The End %%%
 \end{document}

@@ -1,0 +1,98 @@
+\section{Methodology}\label{sec::methodology}
+
+To achieve our goal of comparing concurrency frameworks in Rust and in C, we selected concurrency frameworks for each language. For C, we chose the raw Pthreads library as this was sufficiently low level, simple to program with and reason about, and ubiquitous among programmers. Also, it does not require an additional runtime system like other solutions such as OpenMP or CILK. For Rust, we chose the standard library solution, \texttt{std::thread}, except one benchmark for which we used the \textit{crossbeam} threading library.
+%The motivation for this choice was discussed in section~\ref{sec::rust_concurrency}.
+
+As of Rust 1.0-alpha~\cite{rust-release}, the language removed support for green threading, and instead uses “native OS threads”~\cite{rust-doc}. Rust wraps Pthreads, an inherently unsafe library, with its \texttt{std::thread} library, leveraging its safety features. Consequently, our measurements characterize the efficacy of Rust's use of Pthreads compared to a hand-crafted C implementation.
+
+This research attempts to answer: \textit{Does Rust's concurrency framework, with its emphasis on safety, come with drawbacks that outweigh its usefulness?} To explore this question we sought benchmarks which captured common parallel programming techniques. We chose three: blackscholes (from the PARSEC benchmark suite \cite{parsec}), matrix multiplication, and vector dot product. As programmers most familiar with C/C++, we experienced the semantic differences between Rust and C and gained insight into how Rust's strict compiler may hinder a programmer who takes a typical C approach to implementing a concurrent algorithm. Therefore, a second question we seek to answer is: \textit{Does Rust's insistence on safety unnecessarily hinder a skilled concurrent programmer?}
+
+To measure our benchmarks, we used the Sniper Multi-Core Simulator~\cite{sniper}. We simulated an 8 core machine based on the Nehalem architecture. We ran the benchmarks in serial, avoiding calls to the concurrency frameworks, and then with two, four and eight threads. Our benchmarks invoke the relevant number of threads from the main thread of execution, which then waits for the spawned threads to complete. We took steps to make sure the data access patterns of each benchmark in C and Rust were kept the same. To hone in on the performance of the kernel itself, we took advantage of Sniper's ``region of interest'' feature, which enables us to hone in on the parallelized portions of the benchmarks.
+
+\subsection{Our Benchmarks}
+\subsubsection{Matrix Multiplication}
+We measure the performance of matrix multiplication to examine how each language's concurrency framework handles shared data structures between threads. The benchmark multiplies a matrix $M$ by itself, where $M$ is a matrix of 128 x 128 unsigned integers with values $0, 1, \dots, 127$. This benchmark's Rust implementation differs from our other Rust benchmarks in that we use the \texttt{crossbeam} threading library to parallelize the kernel, rather than \texttt{std::thread}s. This is because we encountered difficulties sharing the output matrix between threads using \texttt{std::thread}s. This shed light on the ways Rust's constraints can restrict the programmer in unexpected ways. We will discuss the development of this benchmark and the switch from \texttt{std::thread}s to \texttt{crossbeam} in Section~\ref{sec::results}. Matrix multiply is a good benchmark to use as it tests both memory access behavior as well as a series of arithmetic operations.
+
+\begin{lstlisting}[caption={Matrix Multiply C kernel}]
+void* multiply(void* slice)
+{
+  int s = (int)slice;   // retrive the slice info
+  int from = (s * SIZE)/num_thrd; // note that this 'slicing' works fine
+  int to = ((s+1) * SIZE)/num_thrd; // even if SIZE is not divisible by num_thrd
+  int i,j,k; 
+  for (i = from; i < to; i++)
+  {  
+    for (j = 0; j < SIZE; j++)
+    {
+      C[i][j] = 0;
+      for ( k = 0; k < SIZE; k++)
+      {
+      	C[i][j] += A[i][k]*B[k][j];
+      }
+    }
+  }
+  return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Matrix Multiply Rust kernel}]
+for i in from..to {
+    for j in 0..TOTAL_SIZE {
+        for k in 0..TOTAL_SIZE {
+            chunk[count] += a[i][k] * b[k][j];
+        }
+        count += 1;
+    }
+}
+
+\end{lstlisting}
+\subsubsection{Blackscholes}
+Blackscholes is a popular benchmark that is part of the PARSEC parallel programming benchmark suite \cite{parsec}. It is a financial application that simulates options pricing using the Black-Scholes partial differential equation. We chose this benchmark because it is widely studied and presents a practical application of concurrent programming.
+To port blackscholes to Rust, we took advantage of Rust's ability to link with C libraries~\cite{rustlinking}. We compiled the blackscholes kernel from PARSEC as a shared library, and linked to it from our Rust code with the \textit{\#link} attribute. At that point, we were able to parallelize calls to the blackscholes kernel using Rust \texttt{std::thread}s.
+For our C tests, we compiled serial and parallel versions of the blackscholes benchmark using the \texttt{parsecmgmt} tool that ships with PARSEC.
+The code for the blackscholes kernel can be found in the PARSEC benchmark suite source code.
+
+\subsubsection{Dot Product}
+Our dot product benchmark computes the dot product of two vectors of $2^{20}$ double-precision values. We measured dot product to explore how Rust's \texttt{Arc} and \texttt{Mutex<T>} type impacts embarrassingly parallel tasks compared to a \texttt{pthread\_mutex\_t} in C. We implemented dot product in two ways. In one implementation, threads compute local sums that are summed together after the threads complete. In the other, threads concurrently add to a global sum, in which case a mutex is required. This allows us to investigate the performance of locks in Rust as compared to C. 
+
+
+\begin{lstlisting}[caption={Dot Product C Kernel}]
+void *dotprod(void *arg)
+{
+    int i, start, end, len ;
+    long tid;
+    double partialsum, *x, *y;
+    tid = (long)arg;
+
+    len = dotstr.veclen;
+    start = tid * len;
+    end   = start + len;
+    x = dotstr.a;
+    y = dotstr.b;
+
+    partialsum = 0;
+    for (i = start; i < end ; i++)
+    {
+        partialsum += (x[i] * y[i]);
+    }
+
+    dotstr.sum[tid] = partialsum;
+
+#if NTHREADS != 1
+    pthread_exit((void*) 0);
+#else
+    return NULL;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Dot Product Rust Kernel}]
+fn dot_prod(x: & Vec<f64>, y: & Vec<f64>, start: usize, end: usize) -> f64 {
+     let mut dotprod: f64 = 0.0;
+     for i in start..end {
+         if i < x.len() {
+             dotprod = dotprod + (x[i] * y[i]);
+         }
+    }
+     dotprod
+ }
+\end{lstlisting}

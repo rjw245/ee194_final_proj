@@ -1,0 +1,8 @@
+\section{Work Related to Rust}\label{sec::relatedwork}
+Other languages take a slightly different approach than Rust to making concurrent programming easier. Rust's own developers admit that Rust is "not particularly original", borrowing many of its design elements from a variety of languages~\cite{rust-influences}. Library based solutions such as OpenMP~\cite{openmp} and CILK/CILK++~\cite{cilk} facilitate writing scalable multithreaded solutions via compiler directives, language extensions and sophisticated runtime systems which schedule threads, balance load, and manage inter-thread communication. Ivory is another programming language with similar design goals to Rust~\cite{ivory}. Designed for high-assurance applications, Ivory is embedded within a variant of Haskell and compiles directly to C. To guarantee memory safety, however, Ivory limits functionality in critical ways, such as:
+\begin{itemize}
+\item Heap allocation is forbidden
+\item All loop iterations must be statically bounded by a constant
+\item Expressions must have no side-effects
+\end{itemize}
+These limitations severely limit expressive power and common programming idioms, but further underscore the importance of memory safety in systems programming. Ivory's design as well as the OpenMP and CILK projects show that there is interest in addressing the same problems that Rust tackles.

@@ -1,4 +1,226 @@
-@ONLINE {rust-lang.org,
+@ONLINE {rust-lang,
     title = "The Rust Programming Language",
-    url   = "https://www.rust-lang.org/"
+    howpublished = "\url{https://www.rust-lang.org/}",
+}
+@ONLINE {rust-doc,
+    title = "Rust std:threads",
+    howpublished = "\url{https://doc.rust-lang.org/std/thread/}",
+}
+@ONLINE {rust-release,
+    title = "Announcing Rust 1.0 Alpha",
+    howpublished = "\url{http://blog.rust-lang.org/2015/01/09/Rust-1.0-alpha.html}",
+}
+@ONLINE {rustlinking,
+    title = "Advanced Linking",
+    howpublished = "\url{https://doc.rust-lang.org/book/advanced-linking.html}",
+}
+@ONLINE {rust-scoped-threads,
+    title = "std::thread::JoinGuard (and scoped) are unsound because of reference cycles #24292",
+    howpublished = "\url{https://github.com/rust-lang/rust/issues/24292}",
+}
+@ONLINE {rust-influences,
+    title = "The Rust Reference",
+    howpublished = "\url{http://doc.rust-lang.org/reference.html}",
+}
+
+@ARTICLE{sniper,
+  author = {Trevor E. Carlson and Wim Heirman and Stijn Eyerman and Ibrahim Hur
+        and Lieven Eeckhout},
+  title = {An Evaluation of High-Level Mechanistic Core Models},
+  journal = {ACM Transactions on Architecture and Code Optimization (TACO)},
+  year = {2014},
+  address = {New York, NY, USA},
+  articleno = {5},
+  doi = {10.1145/2629677},
+  issn = {1544-3566},
+  issue_date = {April 2014},
+  numpages = {23},
+  publisher = {ACM}
+}
+
+@ONLINE {crossbeam,
+    title = "Crate crossbeam",
+    howpublished = "\url{http://aturon.github.io/crossbeam-doc/crossbeam/}",
+}
+
+@ONLINE {rust-issue,
+	title = "Issue \#24292",
+	howpublished = "\url{https://github.com/rust-lang/rust/issues/24292}"
+}
+
+@ONLINE {rayon,
+    title = "Crate rayon",
+    howpublished = "\url{http://nikomatsakis.github.io/rayon/rayon/}",
+}
+
+@phdthesis{cilk,
+  title={The Cilk System for Parallel Multithreaded Computing},
+  author={Joerg, Christopher F},
+  year={1996},
+  school={Massachusetts Institute of Technology}
+}
+
+@ARTICLE{openmp, 
+author={L. Dagum and R. Menon}, 
+journal={IEEE Computational Science and Engineering}, 
+title={OpenMP: an industry standard API for shared-memory programming}, 
+year={1998}, 
+volume={5}, 
+number={1}, 
+pages={46-55}, 
+keywords={application program interfaces;parallel programming;shared memory systems;software portability;software reviews;software standards;Fortran;Fortran 90;Fortran 95;Fortran compiler;OpenMP;X3H5 concepts;allocatables;callable runtime library;callable runtime library routines;coarse grain parallelism;compiler directives;environment variables;industry standard API;pointers;shared memory parallelism;shared memory programming;ANSI standards;Coherence;Computer architecture;Hardware;Message passing;Parallel processing;Parallel programming;Power system modeling;Scalability;Software systems}, 
+doi={10.1109/99.660313}, 
+ISSN={1070-9924}, 
+month={Jan},}
+
+@inproceedings{ivory,
+ author = {Elliott, Trevor and Pike, Lee and Winwood, Simon and Hickey, Pat and Bielman, James and Sharp, Jamey and Seidel, Eric and Launchbury, John},
+ title = {Guilt Free Ivory},
+ booktitle = {Proceedings of the 2015 ACM SIGPLAN Symposium on Haskell},
+ series = {Haskell '15},
+ year = {2015},
+ isbn = {978-1-4503-3808-0},
+ location = {Vancouver, BC, Canada},
+ pages = {189--200},
+ numpages = {12},
+ url = {http://doi.acm.org/10.1145/2804302.2804318},
+ doi = {10.1145/2804302.2804318},
+ acmid = {2804318},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Embedded Domain Specific Languages, Embedded Systems},
+}
+
+@inproceedings{pike-plpv14,
+  author    = {Lee Pike and
+               Patrick C. Hickey and
+               James Bielman and
+               Trevor Elliott and
+               Thomas DuBuisson and
+               John Launchbury},
+  title     = {Programming languages for high-assurance autonomous vehicles: extended abstract},
+  booktitle = {Programming Languages meets Program Verification},
+  publisher = {ACM},
+  year      = {2014},
+  pages     = {1-2},
+  note =      {Available at \url{http://www.cs.indiana.edu/~lepike/pub_pages/plpv14.html}}}
+Learning from Mistakes — A Comprehensive Study on Real World Concurrency Bug Characteristics
+@article{learning,
+ author = {Lu, Shan and Park, Soyeon and Seo, Eunsoo and Zhou, Yuanyuan},
+ title = {Learning from Mistakes: A Comprehensive Study on Real World Concurrency Bug Characteristics},
+ journal = {SIGOPS Oper. Syst. Rev.},
+ issue_date = {March 2008},
+ volume = {42},
+ number = {2},
+ month = mar,
+ year = {2008},
+ issn = {0163-5980},
+ pages = {329--339},
+ numpages = {11},
+ url = {http://doi.acm.org/10.1145/1353535.1346323},
+ doi = {10.1145/1353535.1346323},
+ acmid = {1346323},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {bug characteristics, concurrency bug, concurrent program},
+}
+
+@article{sutter2005free,
+  title={The free lunch is over: A fundamental turn toward concurrency in software},
+  author={Sutter, Herb},
+  journal={Dr. Dobb’s journal},
+  volume={30},
+  number={3},
+  pages={202--210},
+  year={2005}
+}
+
+@Proceedings {heisenbug,
+booktitle    = {OSDI 08: Eigth Symposium on Operating Systems Design & Implementation},
+month        = {December},
+publisher    = {USENIX},
+title        = {Finding and Reproducing Heisenbugs in Concurrent Programs},
+url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=77961},
+year         = {2008},
+}
+
+@article{kendo,
+ author = {Olszewski, Marek and Ansel, Jason and Amarasinghe, Saman},
+ title = {Kendo: Efficient Deterministic Multithreading in Software},
+ journal = {SIGPLAN Not.},
+ issue_date = {March 2009},
+ volume = {44},
+ number = {3},
+ month = mar,
+ year = {2009},
+ issn = {0362-1340},
+ pages = {97--108},
+ numpages = {12},
+ url = {http://doi.acm.org/10.1145/1508284.1508256},
+ doi = {10.1145/1508284.1508256},
+ acmid = {1508256},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {debugging, determinism, deterministic multithreading, multicore, parallel programming},
+}
+
+@inproceedings{ctrigger,
+ author = {Park, Soyeon and Lu, Shan and Zhou, Yuanyuan},
+ title = {CTrigger: Exposing Atomicity Violation Bugs from Their Hiding Places},
+ booktitle = {Proceedings of the 14th International Conference on Architectural Support for Programming Languages and Operating Systems},
+ series = {ASPLOS XIV},
+ year = {2009},
+ isbn = {978-1-60558-406-5},
+ location = {Washington, DC, USA},
+ pages = {25--36},
+ numpages = {12},
+ url = {http://doi.acm.org/10.1145/1508244.1508249},
+ doi = {10.1145/1508244.1508249},
+ acmid = {1508249},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {concurrency bug, software testing},
+}
+
+@inproceedings{grace,
+ author = {Berger, Emery D. and Yang, Ting and Liu, Tongping and Novark, Gene},
+ title = {Grace: Safe Multithreaded Programming for C/C++},
+ booktitle = {Proceedings of the 24th ACM SIGPLAN Conference on Object Oriented Programming Systems Languages and Applications},
+ series = {OOPSLA '09},
+ year = {2009},
+ isbn = {978-1-60558-766-0},
+ location = {Orlando, Florida, USA},
+ pages = {81--96},
+ numpages = {16},
+ url = {http://doi.acm.org/10.1145/1640089.1640096},
+ doi = {10.1145/1640089.1640096},
+ acmid = {1640096},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {concurrency, determinism, deterministic concurrency, fork-join, sequential semantics},
+}
+
+@inproceedings{parsec,
+ author = {Bienia, Christian and Kumar, Sanjeev and Singh, Jaswinder Pal and Li, Kai},
+ title = {The PARSEC Benchmark Suite: Characterization and Architectural Implications},
+ booktitle = {Proceedings of the 17th International Conference on Parallel Architectures and Compilation Techniques},
+ series = {PACT '08},
+ year = {2008},
+ isbn = {978-1-60558-282-5},
+ location = {Toronto, Ontario, Canada},
+ pages = {72--81},
+ numpages = {10},
+ url = {http://doi.acm.org/10.1145/1454115.1454128},
+ doi = {10.1145/1454115.1454128},
+ acmid = {1454128},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {benchmark suite, multithreading, performance measurement, shared-memory computers},
+}
+
+@article{servo,
+  title={Experience report: Developing the Servo web browser engine using Rust},
+  author={Anderson, Brian and Bergstrom, Lars and Herman, David and Matthews, Josh and McAllister, Keegan and Goregaokar, Manish and Moffitt, Jack and Sapin, Simon},
+  journal={arXiv preprint arXiv:1505.07383},
+  year={2015}
 }
